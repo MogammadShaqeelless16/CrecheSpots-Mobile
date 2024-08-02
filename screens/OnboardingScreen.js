@@ -1,10 +1,11 @@
+// OnboardingScreen.js
 import React from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import Onboarding from 'react-native-onboarding-swiper';
 
 function OnboardingScreen({ navigation }) {
   const doneOnboarding = () => {
-    navigation.replace('Home');
+    navigation.replace('Home'); // Ensure 'Home' matches the screen name in the navigator
   };
 
   return (
