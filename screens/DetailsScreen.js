@@ -1,15 +1,23 @@
-// DetailsScreen.js
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 
-function DetailsScreen({ route }) {
-  const { post } = route.params; // Destructure the post from route parameters
+function DetailsScreen() {
+  const route = useRoute();
+  const { creche } = route.params;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{post.title.rendered}</Text>
-      <Text style={styles.content}>{post.content.rendered}</Text>
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      {creche.header_image && (
+        <Image
+          source={{ uri: creche.header_image }}
+          style={styles.headerImage}
+        />
+      )}
+      <Text style={styles.title}>{creche.title.rendered}</Text>
+      <Text style={styles.price}>Price: {creche.price}</Text>
+      <Text style={styles.description}>{creche.content.rendered}</Text>
+    </ScrollView>
   );
 }
 
@@ -19,12 +27,22 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
   },
+  headerImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 5,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+    marginVertical: 10,
+  },
+  price: {
+    fontSize: 18,
+    color: '#333',
     marginBottom: 10,
   },
-  content: {
+  description: {
     fontSize: 16,
     color: '#333',
   },

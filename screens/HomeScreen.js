@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TextInput, Picker, Button } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TextInput, Picker, Button, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 
-function HomeScreen() {
+function HomeScreen({ navigation }) {
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,6 +65,10 @@ function HomeScreen() {
     }
   };
 
+  const handlePress = (item) => {
+    navigation.navigate('CrecheDetails', { creche: item });
+  };
+
   if (loading && page === 1) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
@@ -103,17 +107,19 @@ function HomeScreen() {
         data={filteredPosts}
         keyExtractor={item => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.postContainer}>
-            <Text style={styles.postTitle}>{item.title.rendered}</Text>
-            <Text style={styles.postPrice}>Price: {item.price}</Text>
-            {item.header_image && (
-              <Image
-                source={{ uri: item.header_image }}
-                style={styles.postImage}
-              />
-            )}
-            <Text style={styles.postContent}>{item.content.rendered}</Text>
-          </View>
+          <TouchableOpacity onPress={() => handlePress(item)}>
+            <View style={styles.postContainer}>
+              <Text style={styles.postTitle}>{item.title.rendered}</Text>
+              <Text style={styles.postPrice}>Price: {item.price}</Text>
+              {item.header_image && (
+                <Image
+                  source={{ uri: item.header_image }}
+                  style={styles.postImage}
+                />
+              )}
+              <Text style={styles.postContent}>{item.content.rendered}</Text>
+            </View>
+          </TouchableOpacity>
         )}
         ListFooterComponent={
           hasMore ? (

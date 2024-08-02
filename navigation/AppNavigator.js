@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomTabNavigator from './BottomTabNavigator';
 import OnboardingScreen from '../screens/OnboardingScreen';
+import CrecheDetailsScreen from '../screens/DetailsScreen';
 
 const Stack = createStackNavigator();
 
@@ -37,13 +38,29 @@ function AppNavigator() {
             component={BottomTabNavigator}
             options={{ headerShown: false }}
           />
+          <Stack.Screen
+            name="CrecheDetails"
+            component={CrecheDetailsScreen}
+            options={{ headerTitle: 'Creche Details' }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     );
   } else {
     return (
       <NavigationContainer>
-        <BottomTabNavigator />
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Home"
+            component={BottomTabNavigator}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="CrecheDetails"
+            component={CrecheDetailsScreen}
+            options={{ headerTitle: 'Creche Details' }}
+          />
+        </Stack.Navigator>
       </NavigationContainer>
     );
   }
