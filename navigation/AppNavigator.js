@@ -1,3 +1,4 @@
+// AppNavigator.js
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -5,6 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomTabNavigator from './BottomTabNavigator';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import CrecheDetailsScreen from '../screens/DetailsScreen';
+import SplashScreen from '../screens/SplashScreen'; // Import SplashScreen
+import ApplicationFormScreen from '../screens/ApplicationFormScreen'; // Import ApplicationFormScreen
 
 const Stack = createStackNavigator();
 
@@ -24,42 +27,26 @@ function AppNavigator() {
 
   if (isFirstLaunch === null) {
     return null; // Add a loading screen here if desired
-  } else if (isFirstLaunch === true) {
-    return (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Onboarding"
-            component={OnboardingScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Home"
-            component={BottomTabNavigator}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="CrecheDetails"
-            component={CrecheDetailsScreen}
-            options={{ headerTitle: 'Creche Details' }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    );
   } else {
     return (
       <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Home"
-            component={BottomTabNavigator}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="CrecheDetails"
-            component={CrecheDetailsScreen}
-            options={{ headerTitle: 'Creche Details' }}
-          />
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {isFirstLaunch === true ? (
+            <>
+              <Stack.Screen name="Splash" component={SplashScreen} />
+              <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+              <Stack.Screen name="Home" component={BottomTabNavigator} />
+              <Stack.Screen name="CrecheDetails" component={CrecheDetailsScreen} />
+              <Stack.Screen name="ApplicationFormScreen" component={ApplicationFormScreen} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen name="Splash" component={SplashScreen} />
+              <Stack.Screen name="Home" component={BottomTabNavigator} />
+              <Stack.Screen name="CrecheDetails" component={CrecheDetailsScreen} />
+              <Stack.Screen name="ApplicationFormScreen" component={ApplicationFormScreen} />
+            </>
+          )}
         </Stack.Navigator>
       </NavigationContainer>
     );

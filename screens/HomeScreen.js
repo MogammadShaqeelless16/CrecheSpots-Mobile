@@ -109,7 +109,15 @@ function HomeScreen({ navigation }) {
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => handlePress(item)}>
             <View style={styles.postContainer}>
-              <Text style={styles.postTitle}>{item.title.rendered}</Text>
+              <View style={styles.postTitleContainer}>
+                <Text style={styles.postTitle}>{item.title.rendered}</Text>
+                {item.registered === 'Yes' && (
+                  <Image
+                    source={require('../assets/Registered.png')} // Replace with the path to your registered.png
+                    style={styles.registeredIcon}
+                  />
+                )}
+              </View>
               <Text style={styles.postPrice}>Price: {item.price}</Text>
               {item.header_image && (
                 <Image
@@ -169,9 +177,20 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
+  postTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   postTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    flex: 1,
+  },
+  registeredIcon: {
+    width: 20,
+    height: 20,
+    marginLeft: 10,
   },
   postPrice: {
     fontSize: 16,
