@@ -76,7 +76,6 @@ function MapScreen() {
         {creches.map((creche) => {
           const lat = parseFloat(creche.latitude) || 0;
           const lon = parseFloat(creche.longitude) || 0;
-          const whatsapp = creche.whatsapp || 'Not available';
           const name = creche.title?.rendered || 'No name';
           const price = creche.price || 'Price not available';
 

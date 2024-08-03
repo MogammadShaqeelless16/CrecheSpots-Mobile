@@ -1,6 +1,11 @@
+// HomeScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TextInput, Picker, Button, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, FlatList, Button } from 'react-native';
 import axios from 'axios';
+import SearchBar from '../components/CrecheHome/SearchBar';
+import PostItem from '../components/CrecheHome/PostItem';
+import LoadingIndicator from '../components/CrecheHome/LoadingIndicator';
+import ErrorMessage from '../components/CrecheHome/ErrorMessage';
 
 function HomeScreen({ navigation }) {
   const [posts, setPosts] = useState([]);
@@ -8,7 +13,7 @@ function HomeScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchText, setSearchText] = useState('');
-  const [selectedPrice, setSelectedPrice] = useState('');
+  const [searchAddress, setSearchAddress] = useState('');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
@@ -33,26 +38,26 @@ function HomeScreen({ navigation }) {
 
   const handleSearch = (text) => {
     setSearchText(text);
-    filterPosts(text, selectedPrice);
+    filterPosts(text, searchAddress);
   };
 
-  const handleFilter = (price) => {
-    setSelectedPrice(price);
-    filterPosts(searchText, price);
+  const handleAddressSearch = (text) => {
+    setSearchAddress(text);
+    filterPosts(searchText, text);
   };
 
-  const filterPosts = (text, price) => {
+  const filterPosts = (title, address) => {
     let updatedPosts = [...posts];
 
-    if (text) {
+    if (title) {
       updatedPosts = updatedPosts.filter(post =>
-        post.title.rendered.toLowerCase().includes(text.toLowerCase())
+        post.title.rendered.toLowerCase().includes(title.toLowerCase())
       );
     }
 
-    if (price) {
+    if (address) {
       updatedPosts = updatedPosts.filter(post =>
-        post.price && post.price <= price
+        post.address && post.address.toLowerCase().includes(address.toLowerCase())
       );
     }
 
@@ -70,64 +75,26 @@ function HomeScreen({ navigation }) {
   };
 
   if (loading && page === 1) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return <LoadingIndicator />;
   }
 
   if (error) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>Error: {error}</Text>
-      </View>
-    );
+    return <ErrorMessage message={`Error: ${error}`} />;
   }
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search by title"
-        value={searchText}
-        onChangeText={handleSearch}
+      <SearchBar
+        onSearch={handleSearch}
+        onAddressSearch={handleAddressSearch}
+        searchText={searchText}
+        searchAddress={searchAddress}
       />
-      <View style={styles.filterContainer}>
-        <Text style={styles.filterLabel}>Filter by Price:</Text>
-        <Picker
-          selectedValue={selectedPrice}
-          style={styles.picker}
-          onValueChange={handleFilter}
-        >
-          <Picker.Item label="All Prices" value="" />
-          <Picker.Item label="Up to $50" value="50" />
-          <Picker.Item label="Up to $100" value="100" />
-          <Picker.Item label="Up to $150" value="150" />
-          <Picker.Item label="Up to $200" value="200" />
-        </Picker>
-      </View>
       <FlatList
         data={filteredPosts}
         keyExtractor={item => item.id.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handlePress(item)}>
-            <View style={styles.postContainer}>
-              <View style={styles.postTitleContainer}>
-                <Text style={styles.postTitle}>{item.title.rendered}</Text>
-                {item.registered === 'Yes' && (
-                  <Image
-                    source={require('../assets/Registered.png')} // Replace with the path to your registered.png
-                    style={styles.registeredIcon}
-                  />
-                )}
-              </View>
-              <Text style={styles.postPrice}>Price: {item.price}</Text>
-              {item.header_image && (
-                <Image
-                  source={{ uri: item.header_image }}
-                  style={styles.postImage}
-                />
-              )}
-              <Text style={styles.postContent}>{item.content.rendered}</Text>
-            </View>
-          </TouchableOpacity>
+          <PostItem item={item} onPress={() => handlePress(item)} />
         )}
         ListFooterComponent={
           hasMore ? (
@@ -146,70 +113,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#fff',
-  },
-  searchInput: {
-    height: 40,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-  },
-  filterContainer: {
-    marginBottom: 15,
-  },
-  filterLabel: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  picker: {
-    height: 50,
-    width: '100%',
-  },
-  postContainer: {
-    marginBottom: 20,
-    padding: 15,
-    borderRadius: 5,
-    backgroundColor: '#f9f9f9',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  postTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  postTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    flex: 1,
-  },
-  registeredIcon: {
-    width: 20,
-    height: 20,
-    marginLeft: 10,
-  },
-  postPrice: {
-    fontSize: 16,
-    color: '#333',
-  },
-  postImage: {
-    width: '100%',
-    height: 200,
-    marginTop: 10,
-    borderRadius: 5,
-  },
-  postContent: {
-    marginTop: 10,
-    fontSize: 14,
-    color: '#333',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 16,
   },
   endOfList: {
     textAlign: 'center',
