@@ -1,4 +1,3 @@
-// ApplicationFormScreen.js
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -8,7 +7,7 @@ import ParentDetails from '../components/Application/ParentDetails';
 function ApplicationFormScreen() {
   const route = useRoute();
   const navigation = useNavigation();
-  const { creche } = route.params;
+  const { creche, fromScreen } = route.params; // Retrieve 'fromScreen' parameter
 
   const [childValues, setChildValues] = useState({
     surname: '',
@@ -79,11 +78,24 @@ function ApplicationFormScreen() {
 
     // Add your form submission logic here
     Alert.alert('Success', 'Application submitted successfully');
-    navigation.goBack();
+    if (fromScreen === 'map') {
+      navigation.navigate('MapScreen'); // Go back to MapScreen if from map
+    } else {
+      navigation.navigate('HomeScreen'); // Go back to HomeScreen if from home
+    }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <TouchableOpacity style={styles.backButton} onPress={() => {
+        if (fromScreen === 'map') {
+          navigation.navigate('MapScreen');
+        } else {
+          navigation.navigate('HomeScreen');
+        }
+      }}>
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>Apply to {creche?.title?.rendered || 'Creche'}</Text>
       <ChildDetails values={childValues} onChange={handleChildChange} />
       <ParentDetails parentType="Mother" values={motherValues} onChange={(field, value) => handleParentChange(field, value, 'mother')} />
@@ -116,6 +128,13 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  backButton: {
+    marginBottom: 20,
+  },
+  backButtonText: {
+    color: '#007BFF',
+    fontSize: 16,
   },
 });
 
