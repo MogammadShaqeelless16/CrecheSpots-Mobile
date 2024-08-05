@@ -1,4 +1,3 @@
-// DetailsScreen.js
 import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -18,10 +17,15 @@ function DetailsScreen() {
   const headerImage = creche.header_image || '';
   const description = creche.description || '';
   const registered = creche.registered === 'Yes'; // Check if registered is "Yes"
+  const services = creche.services || {}; // Fetch services data
 
   const handleApplyPress = () => {
     // Navigate to ApplicationFormScreen with creche details
     navigation.navigate('ApplicationFormScreen', { creche });
+  };
+
+  const handleBackPress = () => {
+    navigation.goBack();
   };
 
   return (
@@ -66,13 +70,32 @@ function DetailsScreen() {
           <Icon name="user" size={20} color="#000" />
           <Text style={styles.infoText}>{teacher}</Text>
         </View>
+        
+        {/* Services Section */}
+        <View style={styles.servicesContainer}>
+          <Text style={styles.servicesTitle}>Services:</Text>
+          {Object.entries(services).map(([service, available]) => (
+            <View key={service} style={styles.serviceItem}>
+              <Icon
+                name={available === 'Yes' ? 'check' : 'times'} // Checkmark for available, cross for not available
+                size={20}
+                color={available === 'Yes' ? 'green' : 'red'}
+                style={styles.serviceIcon}
+              />
+              <Text style={styles.serviceText}>{service}</Text>
+            </View>
+          ))}
+        </View>
       </ScrollView>
-      <TouchableOpacity style={styles.applyButton} onPress={handleApplyPress}>
-        <Text style={styles.applyButtonText}>Apply</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Icon name="arrow-left" size={20} color="#fff" />
-      </TouchableOpacity>
+      
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+          <Icon name="arrow-left" size={20} color="#fff" style={styles.backIcon} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.applyButton} onPress={handleApplyPress}>
+          <Text style={styles.applyButtonText}>Apply</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -119,10 +142,35 @@ const styles = StyleSheet.create({
     color: '#333',
     marginLeft: 10,
   },
-  applyButton: {
+  servicesContainer: {
+    marginVertical: 20,
+  },
+  servicesTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  serviceItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  serviceIcon: {
+    marginRight: 10,
+  },
+  serviceText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    paddingBottom: 20,
     position: 'absolute',
-    bottom: 20,
-    right: 20,
+    bottom: 0,
+    width: '100%',
+  },
+  applyButton: {
     backgroundColor: '#007bff',
     borderRadius: 30,
     paddingVertical: 10,
@@ -131,16 +179,15 @@ const styles = StyleSheet.create({
     shadowColor: '#000', // Adds shadow on iOS
     shadowOpacity: 0.3,
     shadowRadius: 5,
+    flex: 2,
   },
   applyButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
     backgroundColor: '#007bff',
     borderRadius: 30,
     padding: 10,
@@ -148,6 +195,13 @@ const styles = StyleSheet.create({
     shadowColor: '#000', // Adds shadow on iOS
     shadowOpacity: 0.3,
     shadowRadius: 5,
+    flex: 1,
+    marginRight: 10,
+    justifyContent: 'center', // Center the icon within the button
+    alignItems: 'center',
+  },
+  backIcon: {
+    textAlign: 'center',
   },
 });
 
