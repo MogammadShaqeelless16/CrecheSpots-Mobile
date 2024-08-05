@@ -1,19 +1,12 @@
+// screens/MapScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text, TextInput, TouchableOpacity, Image, FlatList } from 'react-native';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
-import L from 'leaflet';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
-
-// Custom icon for the marker
-const customIcon = new L.Icon({
-  iconUrl: 'https://static.vecteezy.com/system/resources/thumbnails/019/897/155/small/location-pin-icon-map-pin-place-marker-png.png',
-  iconSize: [32, 32],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32],
-});
+import SearchBar from '../components/Map/SearchBar';
+import SuggestionsList from '../components/Map/SuggestionsList';
+import MapView from '../components/Map/MapView';
 
 function MapScreen() {
   const [location, setLocation] = useState(null);
@@ -35,6 +28,7 @@ function MapScreen() {
       let { coords } = await Location.getCurrentPositionAsync({});
       setLocation(coords);
       setMapCenter([coords.latitude, coords.longitude]);
+      setZoomLevel(13); // Initial zoom level
 
       try {
         const response = await axios.get('https://shaqeel.wordifysites.com/wp-json/wp/v2/creche');
@@ -73,7 +67,7 @@ function MapScreen() {
 
   if (!location || creches.length === 0) {
     return (
-      <View style={styles.container}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
@@ -98,98 +92,27 @@ function MapScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchBar}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search location in South Africa"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
+      <View style={styles.searchBarContainer}>
+        <SearchBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
         />
-        <TouchableOpacity style={styles.searchButton}>
-          <Text style={styles.searchButtonText}>Search</Text>
-        </TouchableOpacity>
       </View>
-      {suggestions.length > 0 && (
-        <FlatList
-          data={suggestions}
-          keyExtractor={(item) => item.place_id.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.suggestion}
-              onPress={() => handleSuggestionPress(item)}
-            >
-              <Text>{item.display_name}</Text>
-            </TouchableOpacity>
-          )}
+      {searchQuery.length > 2 && suggestions.length > 0 && (
+        <SuggestionsList
+          suggestions={suggestions}
+          handleSuggestionPress={handleSuggestionPress}
         />
       )}
-      <MapContainer
-        center={mapCenter}
-        zoom={zoomLevel}
-        style={styles.map}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        <Marker
-          position={mapCenter}
-          icon={customIcon}
-        >
-          <Popup>You are here</Popup>
-        </Marker>
-        {creches.map((creche) => {
-          const lat = parseFloat(creche.latitude) || 0;
-          const lon = parseFloat(creche.longitude) || 0;
-          const name = creche.title?.rendered || 'No name';
-          const price = creche.price || 'Price not available';
-
-          return (
-            <Marker
-              key={creche.id}
-              position={[lat, lon]}
-              icon={customIcon}
-            >
-              <Popup>
-                <View style={styles.popupContent}>
-                  <Text>Name: {name}</Text>
-                  <Text>Price: {price}</Text>
-                  <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                      style={styles.infoButton}
-                      onPress={() => handleInfoPress(creche)}
-                    >
-                      <Image
-                        source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/4/43/Minimalist_info_Icon.png' }}
-                        style={styles.icon}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.applyButton}
-                      onPress={() => handleApplyPress(creche)}
-                    >
-                      <Image
-                        source={{ uri: 'https://static.thenounproject.com/png/2714905-200.png' }}
-                        style={styles.icon}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </Popup>
-            </Marker>
-          );
-        })}
-        {searchLocation && (
-          <Marker
-            position={[searchLocation.latitude, searchLocation.longitude]}
-            icon={customIcon}
-          >
-            <Popup>
-              <Text>Search Result</Text>
-            </Popup>
-          </Marker>
-        )}
-      </MapContainer>
+      <MapView
+        mapCenter={mapCenter}
+        zoomLevel={zoomLevel}
+        creches={creches}
+        location={location}
+        searchLocation={searchLocation}
+        handleInfoPress={handleInfoPress}
+        handleApplyPress={handleApplyPress}
+      />
     </View>
   );
 }
@@ -198,57 +121,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  searchBarContainer: {
     padding: 10,
     backgroundColor: '#fff',
   },
-  searchInput: {
+  loadingContainer: {
     flex: 1,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
-  },
-  searchButton: {
-    backgroundColor: '#007bff',
-    borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    marginLeft: 10,
-  },
-  searchButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  map: {
-    flex: 1,
-  },
-  popupContent: {
-    flexDirection: 'column',
+    justifyContent: 'center',
     alignItems: 'center',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    marginTop: 10,
-  },
-  infoButton: {
-    marginRight: 10,
-  },
-  applyButton: {
-    backgroundColor: '#007bff',
-    borderRadius: 5,
-    padding: 5,
-  },
-  icon: {
-    width: 24,
-    height: 24,
-  },
-  suggestion: {
-    padding: 10,
-    borderBottomColor: '#ddd',
-    borderBottomWidth: 1,
   },
 });
 
