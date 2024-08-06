@@ -1,12 +1,13 @@
 // screens/MapScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet  } from 'react-native';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '../components/Map/SearchBar';
 import SuggestionsList from '../components/Map/SuggestionsList';
 import MapView from '../components/Map/MapView';
+import LoadingIndicator from '../components/CrecheHome/LoadingIndicator';
 
 function MapScreen() {
   const [location, setLocation] = useState(null);
@@ -68,7 +69,7 @@ function MapScreen() {
   if (!location || creches.length === 0) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+          <LoadingIndicator />
       </View>
     );
   }

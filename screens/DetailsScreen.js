@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import HTML from 'react-native-render-html';
 import HeaderSection from '../components/CrecheDetails/HeaderSection'; // Import the HeaderSection component
 import SocialSection from '../components/CrecheDetails/SocialSection'; // Import the SocialSection component
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import Icon if used in this file
 import ButtonSection from '../components/CrecheDetails/ButtonsSection'; // Adjust the import path as needed
+import axios from 'axios'; // Import axios if used for making HTTP requests
 
 function DetailsScreen() {
   const route = useRoute();
@@ -33,14 +34,14 @@ function DetailsScreen() {
       });
       if (response.status === 200) {
         // Handle successful reservation
-        alert('Reservation successful!');
+        Alert.alert('Reservation successful!');
       } else {
         // Handle failure
-        alert('Reservation failed.');
+        Alert.alert('Reservation failed.');
       }
     } catch (error) {
       console.error(error);
-      alert('An error occurred.');
+      Alert.alert('An error occurred.');
     }
   };
 
@@ -48,6 +49,10 @@ function DetailsScreen() {
     const baseAmount = parseFloat(price.replace(/[^\d.-]/g, ''));
     const commissionPercentage = 10; // Example commission percentage
     return baseAmount + (baseAmount * commissionPercentage / 100);
+  };
+
+  const handleApplyPress = () => {
+    navigation.navigate('ApplicationFormScreen', { creche });
   };
 
   return (
@@ -105,7 +110,7 @@ function DetailsScreen() {
         />
         <ButtonSection 
           text="Apply"
-          onPress={() => alert('Apply button pressed')}
+          onPress={handleApplyPress}
           style={styles.applyButton}
         />
         <ButtonSection 
