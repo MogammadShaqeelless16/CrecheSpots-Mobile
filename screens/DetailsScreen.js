@@ -1,8 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Linking } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Or any other icon set you prefer
-import HTML from 'react-native-render-html'; // Import the HTML rendering component
+import HTML from 'react-native-render-html';
+import HeaderSection from '../components/CrecheDetails/HeaderSection'; // Import the HeaderSection component
+import SocialSection from '../components/CrecheDetails/SocialSection'; // Import the SocialSection component
+import Icon from 'react-native-vector-icons/FontAwesome'; // Import Icon if used in this file
+import ButtonSection from '../components/CrecheDetails/ButtonsSection'; // Adjust the import path as needed
 
 function DetailsScreen() {
   const route = useRoute();
@@ -10,33 +13,48 @@ function DetailsScreen() {
   const { creche } = route.params;
 
   // Extract fields from creche object
-  const whatsapp = creche.whatsapp || 'Not available';
-  const email = creche.email || 'Not available';
+  const whatsapp = creche.whatsapp || null;
+  const email = creche.email || null;
   const teacher = creche.teacher || 'Not available';
   const price = creche.price || 'Not available';
   const headerImage = creche.header_image || '';
+  const logo = creche.logo || ''; // Add logo field
   const description = creche.description || '';
   const registered = creche.registered === 'Yes'; // Check if registered is "Yes"
   const services = creche.services || {}; // Fetch services data
 
-  const handleApplyPress = () => {
-    // Navigate to ApplicationFormScreen with creche details
-    navigation.navigate('ApplicationFormScreen', { creche });
+  const handleReservePress = async () => {
+    try {
+      const response = await axios.post('https://your-wordpress-site.com/wp-json/myplugin/v1/reserve', {
+        creche_id: creche.id,
+        amount: calculateAmount(price), // Calculate total amount including your commission
+        payment_method: 'stripe', // Or other payment method
+        user_id: 'user-id', // Replace with actual user ID
+      });
+      if (response.status === 200) {
+        // Handle successful reservation
+        alert('Reservation successful!');
+      } else {
+        // Handle failure
+        alert('Reservation failed.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred.');
+    }
   };
 
-  const handleBackPress = () => {
-    navigation.goBack();
+  const calculateAmount = (price) => {
+    const baseAmount = parseFloat(price.replace(/[^\d.-]/g, ''));
+    const commissionPercentage = 10; // Example commission percentage
+    return baseAmount + (baseAmount * commissionPercentage / 100);
   };
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollView}>
-        {headerImage ? (
-          <Image
-            source={{ uri: headerImage }}
-            style={styles.headerImage}
-          />
-        ) : null}
+        <HeaderSection headerImage={headerImage} logo={logo} />
+        
         <Text style={styles.title}>{creche.title?.rendered || 'No title'}</Text>
         <View style={styles.priceContainer}>
           <Text style={styles.price}>Price: {price} Per Month</Text>
@@ -57,19 +75,9 @@ function DetailsScreen() {
             a: { color: '#007bff' },
           }}
         />
-        
-        <View style={styles.infoContainer}>
-          <Icon name="whatsapp" size={20} color="#25D366" />
-          <Text style={styles.infoText}>{whatsapp}</Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <Icon name="envelope" size={20} color="#000" />
-          <Text style={styles.infoText}>{email}</Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <Icon name="user" size={20} color="#000" />
-          <Text style={styles.infoText}>{teacher}</Text>
-        </View>
+
+        {/* Social Section */}
+        <SocialSection whatsapp={whatsapp} email={email} teacher={teacher} />
         
         {/* Services Section */}
         <View style={styles.servicesContainer}>
@@ -89,12 +97,23 @@ function DetailsScreen() {
       </ScrollView>
       
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
-          <Icon name="arrow-left" size={20} color="#fff" style={styles.backIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.applyButton} onPress={handleApplyPress}>
-          <Text style={styles.applyButtonText}>Apply</Text>
-        </TouchableOpacity>
+        <ButtonSection 
+          icon="arrow-left"
+          iconOnly
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        />
+        <ButtonSection 
+          text="Apply"
+          onPress={() => alert('Apply button pressed')}
+          style={styles.applyButton}
+        />
+        <ButtonSection 
+          icon="credit-card"
+          iconOnly
+          onPress={handleReservePress}
+          style={styles.reserveButton}
+        />
       </View>
     </View>
   );
@@ -107,11 +126,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flexGrow: 1,
-  },
-  headerImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 5,
+    paddingHorizontal: 16, // Add horizontal padding to the scroll view
   },
   title: {
     fontSize: 24,
@@ -130,16 +145,6 @@ const styles = StyleSheet.create({
   registeredIcon: {
     width: 20,
     height: 20,
-    marginLeft: 10,
-  },
-  infoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  infoText: {
-    fontSize: 16,
-    color: '#333',
     marginLeft: 10,
   },
   servicesContainer: {
@@ -169,39 +174,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
-  },
-  applyButton: {
-    backgroundColor: '#007bff',
-    borderRadius: 30,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    elevation: 5, // Adds shadow on Android
-    shadowColor: '#000', // Adds shadow on iOS
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    flex: 2,
-  },
-  applyButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    justifyContent: 'space-between', // Add space between buttons
   },
   backButton: {
-    backgroundColor: '#007bff',
-    borderRadius: 30,
-    padding: 10,
-    elevation: 5, // Adds shadow on Android
-    shadowColor: '#000', // Adds shadow on iOS
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
     flex: 1,
-    marginRight: 10,
-    justifyContent: 'center', // Center the icon within the button
-    alignItems: 'center',
   },
-  backIcon: {
-    textAlign: 'center',
+  applyButton: {
+    flex: 2,
+  },
+  reserveButton: {
+    flex: 1,
   },
 });
 
