@@ -1,16 +1,19 @@
 // BottomTabNavigator.js
-import React from 'react';
+import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/Ionicons'; // Use the Ionicons font
+import Icon from 'react-native-vector-icons/Ionicons';
 import HomeScreen from '../screens/HomeScreen';
-import SettingsScreen from '../screens/LoginScreen';
 import MapScreen from '../screens/MapScreen';
 import ApplicationScreen from '../screens/ApplicationScreen';
 import LoginScreen from '../screens/LoginScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const Tab = createBottomTabNavigator();
 
-function BottomTabNavigator() {
+const BottomTabNavigator = () => {
+  const { isAuthenticated, user } = useAuth0(); // Use AuthContext
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -21,14 +24,17 @@ function BottomTabNavigator() {
             case 'Home':
               iconName = 'home-outline';
               break;
-            case 'Settings':
-              iconName = 'settings-outline';
-              break;
             case 'Map':
               iconName = 'map-outline';
               break;
             case 'Applications':
               iconName = 'apps-outline';
+              break;
+            case 'Profile':
+              iconName = 'person-circle-outline';
+              break;
+            case 'Login':
+              iconName = 'log-in-outline';
               break;
             default:
               iconName = 'ellipse-outline';
@@ -39,15 +45,35 @@ function BottomTabNavigator() {
         },
         tabBarActiveTintColor: 'tomato',
         tabBarInactiveTintColor: 'gray',
-        headerShown: false, // Disable the top title for all screens
+        headerShown: false, // Hide the header for bottom tab screens
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Map" component={MapScreen} />
       <Tab.Screen name="Applications" component={ApplicationScreen} />
-      <Tab.Screen name="Login" component={LoginScreen} />
+      {isAuthenticated ? (
+        <Tab.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="person-circle-outline" size={size} color={color} />
+            ),
+          }}
+        />
+      ) : (
+        <Tab.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="log-in-outline" size={size} color={color} />
+            ),
+          }}
+        />
+      )}
     </Tab.Navigator>
   );
-}
+};
 
 export default BottomTabNavigator;

@@ -1,96 +1,96 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import HTML from 'react-native-render-html';
-import HeaderSection from '../components/CrecheDetails/HeaderSection'; // Import the HeaderSection component
-import SocialSection from '../components/CrecheDetails/SocialSection'; // Import the SocialSection component
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import Icon if used in this file
-import ButtonSection from '../components/CrecheDetails/ButtonsSection'; // Adjust the import path as needed
-import axios from 'axios'; // Import axios if used for making HTTP requests
+import HeaderSection from '../components/CrecheDetails/HeaderSection';
+import SocialSection from '../components/CrecheDetails/SocialSection';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import ButtonSection from '../components/CrecheDetails/ButtonsSection';
+import axios from 'axios';
+import { AuthContext } from '../contexts/AuthContext';
+import WarningMessage from '../components/WarningMessage';
 
 function DetailsScreen() {
   const route = useRoute();
   const navigation = useNavigation();
   const { creche } = route.params;
 
-  // Extract fields from creche object
+  const { isAuthenticated } = useContext(AuthContext);
+
+  const [showWarning, setShowWarning] = useState(false);
+
   const whatsapp = creche.whatsapp || null;
   const email = creche.email || null;
   const teacher = creche.teacher || 'Not available';
   const price = creche.price || 'Not available';
   const headerImage = creche.header_image || '';
-  const logo = creche.logo || ''; // Add logo field
+  const logo = creche.logo || '';
   const description = creche.description || '';
-  const registered = creche.registered === 'Yes'; // Check if registered is "Yes"
-  const services = creche.services || {}; // Fetch services data
+  const registered = creche.registered === 'Yes';
+  const services = creche.services || {};
 
   const handleReservePress = async () => {
     try {
       const response = await axios.post('https://your-wordpress-site.com/wp-json/myplugin/v1/reserve', {
         creche_id: creche.id,
-        amount: calculateAmount(price), // Calculate total amount including your commission
-        payment_method: 'stripe', // Or other payment method
-        user_id: 'user-id', // Replace with actual user ID
+        amount: calculateAmount(price),
+        payment_method: 'stripe',
+        user_id: 'user-id',
       });
       if (response.status === 200) {
         // Handle successful reservation
-        Alert.alert('Reservation successful!');
       } else {
         // Handle failure
-        Alert.alert('Reservation failed.');
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('An error occurred.');
     }
   };
 
   const calculateAmount = (price) => {
     const baseAmount = parseFloat(price.replace(/[^\d.-]/g, ''));
-    const commissionPercentage = 10; // Example commission percentage
+    const commissionPercentage = 10;
     return baseAmount + (baseAmount * commissionPercentage / 100);
   };
 
   const handleApplyPress = () => {
-    navigation.navigate('ApplicationFormScreen', { creche });
+    if (!isAuthenticated) {
+      setShowWarning(true);
+    } else {
+      setShowWarning(false);
+      navigation.navigate('ApplicationFormScreen', { creche });
+    }
   };
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollView}>
         <HeaderSection headerImage={headerImage} logo={logo} />
-        
         <Text style={styles.title}>{creche.title?.rendered || 'No title'}</Text>
         <View style={styles.priceContainer}>
           <Text style={styles.price}>Price: {price} Per Month</Text>
           {registered && (
             <Image
-              source={require('../assets/Registered.png')} // Replace with the path to your registered.png
+              source={require('../assets/Registered.png')}
               style={styles.registeredIcon}
             />
           )}
         </View>
-        
-        {/* Render HTML description */}
         <HTML
           source={{ html: description }}
-          contentWidth={300} // Adjust width based on your design
+          contentWidth={300}
           tagsStyles={{
             p: { fontSize: 16, color: '#333' },
             a: { color: '#007bff' },
           }}
         />
-
-        {/* Social Section */}
         <SocialSection whatsapp={whatsapp} email={email} teacher={teacher} />
-        
-        {/* Services Section */}
         <View style={styles.servicesContainer}>
           <Text style={styles.servicesTitle}>Services:</Text>
           {Object.entries(services).map(([service, available]) => (
             <View key={service} style={styles.serviceItem}>
               <Icon
-                name={available === 'Yes' ? 'check' : 'times'} // Checkmark for available, cross for not available
+                name={available === 'Yes' ? 'check' : 'times'}
                 size={20}
                 color={available === 'Yes' ? 'green' : 'red'}
                 style={styles.serviceIcon}
@@ -99,21 +99,27 @@ function DetailsScreen() {
             </View>
           ))}
         </View>
+        {showWarning && (
+          <WarningMessage
+            message="Please sign in to apply."
+            visible={showWarning}
+            onHide={() => setShowWarning(false)}
+          />
+        )}
       </ScrollView>
-      
       <View style={styles.buttonsContainer}>
-        <ButtonSection 
+        <ButtonSection
           icon="arrow-left"
           iconOnly
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         />
-        <ButtonSection 
+        <ButtonSection
           text="Apply"
           onPress={handleApplyPress}
           style={styles.applyButton}
         />
-        <ButtonSection 
+        <ButtonSection
           icon="credit-card"
           iconOnly
           onPress={handleReservePress}
@@ -131,7 +137,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flexGrow: 1,
-    paddingHorizontal: 16, // Add horizontal padding to the scroll view
+    paddingHorizontal: 16,
   },
   title: {
     fontSize: 24,
@@ -179,7 +185,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    justifyContent: 'space-between', // Add space between buttons
+    justifyContent: 'space-between',
   },
   backButton: {
     flex: 1,

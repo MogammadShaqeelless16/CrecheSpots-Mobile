@@ -7,6 +7,7 @@ import OnboardingScreen from '../screens/OnboardingScreen';
 import CrecheDetailsScreen from '../screens/DetailsScreen';
 import SplashScreen from '../screens/SplashScreen'; // Import SplashScreen
 import ApplicationFormScreen from '../screens/ApplicationFormScreen'; // Import ApplicationFormScreen
+import { AuthProvider } from '../contexts/AuthContext'; // Import AuthProvider
 
 const Stack = createStackNavigator();
 
@@ -29,25 +30,27 @@ function AppNavigator() {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isFirstLaunch ? (
-          <>
-            <Stack.Screen name="Splash" component={SplashScreen} />
-            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-            <Stack.Screen name="Home" component={BottomTabNavigator} />
-            <Stack.Screen name="CrecheDetails" component={CrecheDetailsScreen} />
-            <Stack.Screen name="ApplicationFormScreen" component={ApplicationFormScreen} />
-          </>
-        ) : (
-          <>
-            <Stack.Screen name="Home" component={BottomTabNavigator} />
-            <Stack.Screen name="CrecheDetails" component={CrecheDetailsScreen} />
-            <Stack.Screen name="ApplicationFormScreen" component={ApplicationFormScreen} />
-          </>
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthProvider> {/* Wrap in AuthProvider to provide authentication context */}
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {isFirstLaunch ? (
+            <>
+              <Stack.Screen name="Splash" component={SplashScreen} />
+              <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+              <Stack.Screen name="Home" component={BottomTabNavigator} />
+              <Stack.Screen name="CrecheDetails" component={CrecheDetailsScreen} />
+              <Stack.Screen name="ApplicationFormScreen" component={ApplicationFormScreen} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen name="Home" component={BottomTabNavigator} />
+              <Stack.Screen name="CrecheDetails" component={CrecheDetailsScreen} />
+              <Stack.Screen name="ApplicationFormScreen" component={ApplicationFormScreen} />
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
 

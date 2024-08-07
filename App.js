@@ -10,7 +10,9 @@ export default function App() {
     <Auth0Provider
       domain={AUTH0_DOMAIN}
       clientId={AUTH0_CLIENT_ID}
-      redirectUri={window.location.origin} // Adjust for your platform needs
+      authorizationParams={{
+        redirect_uri: window.location.origin // Adjust for your platform needs
+      }}
     >
       <View style={styles.container}>
         <AppNavigator />
