@@ -39,6 +39,7 @@ function BottomTabNavigator() {
         },
         tabBarActiveTintColor: 'tomato',
         tabBarInactiveTintColor: 'gray',
+        headerShown: false, // Disable the top title for all screens
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
