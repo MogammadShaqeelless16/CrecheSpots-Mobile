@@ -1,5 +1,5 @@
 // BottomTabNavigator.js
-import React, { useContext } from 'react';
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import HomeScreen from '../screens/HomeScreen';
@@ -7,12 +7,13 @@ import MapScreen from '../screens/MapScreen';
 import ApplicationScreen from '../screens/ApplicationScreen';
 import LoginScreen from '../screens/LoginScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import NewsScreen from '../screens/NewsScreen'; // Import the NewsScreen
 import { useAuth0 } from '@auth0/auth0-react';
 
 const Tab = createBottomTabNavigator();
 
 const BottomTabNavigator = () => {
-  const { isAuthenticated, user } = useAuth0(); // Use AuthContext
+  const { isAuthenticated } = useAuth0(); // Use AuthContext
 
   return (
     <Tab.Navigator
@@ -29,6 +30,9 @@ const BottomTabNavigator = () => {
               break;
             case 'Applications':
               iconName = 'apps-outline';
+              break;
+            case 'News':
+              iconName = 'newspaper-outline'; // News icon
               break;
             case 'Profile':
               iconName = 'person-circle-outline';
@@ -51,6 +55,15 @@ const BottomTabNavigator = () => {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Map" component={MapScreen} />
       <Tab.Screen name="Applications" component={ApplicationScreen} />
+      <Tab.Screen 
+        name="News" 
+        component={NewsScreen} 
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="newspaper-outline" size={size} color={color} />
+          ),
+        }}
+      />
       {isAuthenticated ? (
         <Tab.Screen
           name="Profile"

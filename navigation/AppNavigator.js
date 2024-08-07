@@ -7,6 +7,8 @@ import OnboardingScreen from '../screens/OnboardingScreen';
 import CrecheDetailsScreen from '../screens/DetailsScreen';
 import SplashScreen from '../screens/SplashScreen'; // Import SplashScreen
 import ApplicationFormScreen from '../screens/ApplicationFormScreen'; // Import ApplicationFormScreen
+import NewsScreen from '../screens/NewsScreen'; // Import NewsScreen
+import NewsDetailsScreen from '../screens/NewsDetailsScreen'; // Import NewsDetailsScreen
 import { AuthProvider } from '../contexts/AuthContext'; // Import AuthProvider
 
 const Stack = createStackNavigator();
@@ -40,12 +42,16 @@ function AppNavigator() {
               <Stack.Screen name="Home" component={BottomTabNavigator} />
               <Stack.Screen name="CrecheDetails" component={CrecheDetailsScreen} />
               <Stack.Screen name="ApplicationFormScreen" component={ApplicationFormScreen} />
+              <Stack.Screen name="News" component={NewsScreen} />
+              <Stack.Screen name="NewsDetails" component={NewsDetailsScreen} />
             </>
           ) : (
             <>
               <Stack.Screen name="Home" component={BottomTabNavigator} />
               <Stack.Screen name="CrecheDetails" component={CrecheDetailsScreen} />
               <Stack.Screen name="ApplicationFormScreen" component={ApplicationFormScreen} />
+              <Stack.Screen name="News" component={NewsScreen} />
+              <Stack.Screen name="NewsDetails" component={NewsDetailsScreen} />
             </>
           )}
         </Stack.Navigator>
