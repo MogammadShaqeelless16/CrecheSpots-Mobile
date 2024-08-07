@@ -1,10 +1,8 @@
-// NewsScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, ActivityIndicator, StyleSheet, Text } from 'react-native';
 import axios from 'axios';
-import PostItem from '../components/News/PostItem';
+import PostItem from '../components/News/PostItem'; // Ensure this component accepts the post and onPress props
 import { useNavigation } from '@react-navigation/native';
-import RenderHtml from 'react-native-render-html';
 
 const NewsScreen = () => {
   const [posts, setPosts] = useState([]);
@@ -60,7 +58,7 @@ const NewsScreen = () => {
   };
 
   const handlePress = (post) => {
-    navigation.navigate('NewsDetailsScreen', { post });
+    navigation.navigate('NewsDetails', { post });
   };
 
   return (
@@ -71,7 +69,9 @@ const NewsScreen = () => {
         <FlatList
           data={posts}
           keyExtractor={keyExtractor}
-          renderItem={({ item }) => <PostItem post={item} onPress={handlePress} />}
+          renderItem={({ item }) => (
+            <PostItem post={item} onPress={() => handlePress(item)} />
+          )}
           ListEmptyComponent={<Text>No posts available</Text>}
         />
       )}
