@@ -1,10 +1,9 @@
-// contexts/AuthContext.js
 import React, { createContext, useState, useEffect } from 'react';
 import Auth0 from 'react-native-auth0'; // Ensure you have the correct package installed
 
 // Initialize Auth0 instance with domain and client ID
 const auth = new Auth0({
-  domain: process.env.AUTH0_DOMAIN, // Make sure these values are correctly set
+  domain: process.env.AUTH0_DOMAIN, // Ensure these values are set correctly
   clientId: process.env.AUTH0_CLIENT_ID,
 });
 
@@ -17,8 +16,9 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const credentials = await auth.auth.credentials();
-        if (credentials.accessToken) {
+        // Check if the user has an active session
+        const credentials = await auth.auth.currentSession();
+        if (credentials) {
           setIsAuthenticated(true);
           const userInfo = await auth.auth.userInfo({ token: credentials.accessToken });
           setUser(userInfo);
@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async () => {
     try {
+      // Use the authorization method for login
       await auth.auth.authorize({ scope: 'openid profile email' });
       // Handle successful login here, e.g., update state or redirect
     } catch (error) {
@@ -47,6 +48,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
+      // Use the clearSession method to log out
       await auth.auth.clearSession();
       setIsAuthenticated(false);
       setUser(null);

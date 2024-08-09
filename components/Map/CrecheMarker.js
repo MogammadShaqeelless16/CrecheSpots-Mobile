@@ -1,3 +1,4 @@
+// components/Map/CrecheMarker.js
 import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
@@ -18,11 +19,14 @@ function CrecheMarker({ creche, handleInfoPress, handleApplyPress }) {
   const price = creche.price || 'Price not available';
 
   return (
-    <Marker position={[lat, lon]} icon={customIcon}>
+    <Marker
+      position={[lat, lon]}
+      icon={customIcon}
+    >
       <Popup>
         <View style={styles.popupContent}>
-          <Text style={styles.boldText}>{name}</Text>
-          <Text>{price}</Text>
+          <Text>Name: {name}</Text>
+          <Text>Price: {price}</Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.infoButton}
@@ -53,11 +57,6 @@ const styles = StyleSheet.create({
   popupContent: {
     flexDirection: 'column',
     alignItems: 'center',
-  },
-  boldText: {
-    fontWeight: 'bold', // Bold the creche name
-    fontSize: 16,       // Adjust font size if needed
-    marginBottom: 5,
   },
   buttonContainer: {
     flexDirection: 'row',
