@@ -1,39 +1,38 @@
-// components/Map/SuggestionsList.js
+// SuggestionsList.js
 import React from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-function SuggestionsList({ suggestions, handleSuggestionPress }) {
+const SuggestionsList = ({ suggestions, onSelect }) => {
   return (
     <View style={styles.container}>
-      <FlatList
-        data={suggestions}
-        keyExtractor={(item) => item.place_id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.suggestion}
-            onPress={() => handleSuggestionPress(item)}
-          >
-            <Text>{item.display_name}</Text>
-          </TouchableOpacity>
-        )}
-      />
+      {suggestions.map((suggestion) => (
+        <TouchableOpacity
+          key={suggestion.id}
+          style={styles.item}
+          onPress={() => onSelect(suggestion)}
+        >
+          <Text style={styles.title}>{suggestion.title?.rendered || 'No title'}</Text>
+          <Text>{suggestion.price}</Text>
+        </TouchableOpacity>
+      ))}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    top: 60, // Adjust based on your search bar height
-    left: 0,
-    right: 0,
-    backgroundColor: '#fff',
-    zIndex: 1000,
-  },
-  suggestion: {
+    flex: 1,
     padding: 10,
-    borderBottomColor: '#ddd',
-    borderBottomWidth: 1,
+  },
+  item: {
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 5,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

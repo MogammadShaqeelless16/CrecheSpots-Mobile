@@ -1,47 +1,37 @@
 // SearchBar.js
-import React from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, TextInput, StyleSheet } from 'react-native';
 
-const SearchBar = ({ searchQuery, setSearchQuery }) => {
+const SearchBar = ({ onSearch }) => {
+  const [query, setQuery] = useState('');
+
+  const handleChange = (text) => {
+    setQuery(text);
+    onSearch(text);
+  };
+
   return (
-    <View style={styles.searchBar}>
+    <View style={styles.container}>
       <TextInput
-        style={styles.searchInput}
-        placeholder="Search location in South Africa"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
+        style={styles.input}
+        placeholder="Search..."
+        value={query}
+        onChangeText={handleChange}
       />
-      <TouchableOpacity style={styles.searchButton}>
-        <Text style={styles.searchButtonText}>Search</Text>
-      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  container: {
     padding: 10,
-    backgroundColor: '#fff',
   },
-  searchInput: {
-    flex: 1,
+  input: {
+    height: 40,
     borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 5,
-    padding: 10,
-  },
-  searchButton: {
-    backgroundColor: '#007bff',
-    borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    marginLeft: 10,
-  },
-  searchButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    paddingHorizontal: 10,
   },
 });
 

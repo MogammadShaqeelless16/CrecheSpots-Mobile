@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, PanResponder, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
-import { Platform } from 'react-native';
+
 
 const MapTray = ({ creches, userLocation, onPress, onZoomIn }) => {
   const [expanded, setExpanded] = useState(false);
