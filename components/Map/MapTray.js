@@ -91,7 +91,7 @@ const MapTray = ({ creches, userLocation, onPress, onZoomIn }) => {
             style={styles.button}
             onPress={() => handleZoomIn(creche)}
           >
-            <Icon name="location-arrow" size={20} color="#fff" />
+          <Icon name="map-pin" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
       ))}
