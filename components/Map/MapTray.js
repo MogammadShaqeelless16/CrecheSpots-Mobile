@@ -1,11 +1,12 @@
+// MapTray.js
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, PanResponder } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, PanResponder, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the icon library
+import { Platform } from 'react-native';
 
 const MapTray = ({ creches, userLocation, onPress, onZoomIn }) => {
   const [expanded, setExpanded] = useState(false);
   const [trayHeight, setTrayHeight] = useState(new Animated.Value(150)); // Default height
-  const [animation] = useState(new Animated.Value(0)); // Animation for zoom effect
 
   // Calculate distances between user and creches
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -53,27 +54,6 @@ const MapTray = ({ creches, userLocation, onPress, onZoomIn }) => {
     [trayHeight]
   );
 
-  // Handle zoom-in button press with animation
-  const handleZoomIn = (creche) => {
-    const { latitude, longitude } = creche;
-
-    // Define zoom animation
-    Animated.sequence([
-      Animated.timing(animation, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      Animated.timing(animation, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      onZoomIn(creche); // Callback to zoom into the creche
-    });
-  };
-
   return (
     <Animated.View
       style={[styles.container, { height: trayHeight }]}
@@ -89,9 +69,9 @@ const MapTray = ({ creches, userLocation, onPress, onZoomIn }) => {
           </View>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => handleZoomIn(creche)}
+            onPress={() => onZoomIn(creche)}
           >
-            <Icon name="location-arrow" size={20} color="#fff" />
+            <Icon name="map-pin" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
       ))}
